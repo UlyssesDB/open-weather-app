@@ -1,103 +1,350 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import { useJsApiLoader } from "@react-google-maps/api";
+import Favorites from "./components/Favorites";
+import Map from "./components/Map";
+import SearchBar from "./components/SearchBar";
+import ToggleSwitch from "./components/ToggleSwitch";
+import DetailedView from "./components/DetailedView";
+import { convertTemp } from "./utils/convertTemp";
+
+const libraries: (
+  | "places"
+  | "drawing"
+  | "geometry"
+  | "localContext"
+  | "visualization"
+)[] = ["places"];
+
+interface WeatherData {
+  coord: { lat: number; lon: number };
+  main: { temp: number; humidity: number; pressure: number };
+  weather: { description: string; icon: string }[];
+  wind: { speed: number; deg: number };
+  clouds: { all: number };
+  rain?: { "3h"?: number };
+}
+
+interface Location {
+  lat: number;
+  lng: number;
+  city?: string;
+  temp: number;
+  weather?: string;
+  icon?: string;
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
+  const apiKey = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  const { isLoaded, loadError } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey,
+    libraries,
+  });
+
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
+    null
+  );
+  const [mapCenter, setMapCenter] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [isCelsius, setIsCelsius] = useState(false);
+  const [favorites, setFavorites] = useState<Location[]>([]);
+  const [weatherCache, setWeatherCache] = useState<Record<string, WeatherData>>(
+    {}
+  );
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  const fetchWeatherByCity = async (city: string): Promise<Location> => {
+    if (weatherCache[city]) {
+      const cached = weatherCache[city];
+      return {
+        city,
+        lat: cached.coord.lat,
+        lng: cached.coord.lon,
+        temp: convertTemp(cached.main.temp, isCelsius),
+        weather: cached.weather[0]?.description,
+        icon: cached.weather[0]?.icon
+          ? `http://openweathermap.org/img/w/${cached.weather[0].icon}.png`
+          : undefined,
+      };
+    }
+    try {
+      const response = await fetch(
+        `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`
+      );
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: "Unknown error" }));
+        throw new Error(
+          `Failed to fetch weather for ${city}: ${errorData.message} (Status: ${response.status})`
+        );
+      }
+      const data: WeatherData = await response.json();
+      console.log(
+        `page.tsx - Fetched ${city} raw temp (Kelvin): ${data.main.temp}`
+      );
+      setWeatherCache((prev) => ({ ...prev, [city]: data }));
+      return {
+        city,
+        lat: data.coord.lat,
+        lng: data.coord.lon,
+        temp: convertTemp(data.main.temp, isCelsius),
+        weather: data.weather[0]?.description,
+        icon: data.weather[0]?.icon
+          ? `http://openweathermap.org/img/w/${data.weather[0].icon}.png`
+          : undefined,
+      };
+    } catch (error) {
+      console.error(
+        `page.tsx - Error in fetchWeatherByCity for ${city}:`,
+        error
+      );
+      setApiError(
+        error instanceof Error ? error.message : "Unknown fetch error"
+      );
+      return { city, lat: 0, lng: 0, temp: 0 };
+    }
+  };
+
+  const fetchWeatherByCoords = async (
+    lat: number,
+    lng: number,
+    city?: string
+  ): Promise<Location> => {
+    const cacheKey = `${lat},${lng}`;
+    if (weatherCache[cacheKey]) {
+      const cached = weatherCache[cacheKey];
+      return {
+        city,
+        lat: cached.coord.lat,
+        lng: cached.coord.lon,
+        temp: convertTemp(cached.main.temp, isCelsius),
+        weather: cached.weather[0]?.description,
+        icon: cached.weather[0]?.icon
+          ? `http://openweathermap.org/img/w/${cached.weather[0].icon}.png`
+          : undefined,
+      };
+    }
+    try {
+      const response = await fetch(
+        `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${apiKey}`
+      );
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: "Unknown error" }));
+        throw new Error(
+          `Failed to fetch weather for ${lat},${lng}: ${errorData.message} (Status: ${response.status})`
+        );
+      }
+      const data: WeatherData = await response.json();
+      console.log(
+        `page.tsx - Fetched ${city || cacheKey} raw temp (Kelvin): ${
+          data.main.temp
+        }`
+      );
+      setWeatherCache((prev) => ({
+        ...prev,
+        [cacheKey]: data,
+        ...(city ? { [city]: data } : {}),
+      }));
+      return {
+        city,
+        lat: data.coord.lat,
+        lng: data.coord.lon,
+        temp: convertTemp(data.main.temp, isCelsius),
+        weather: data.weather[0]?.description,
+        icon: data.weather[0]?.icon
+          ? `http://openweathermap.org/img/w/${data.weather[0].icon}.png`
+          : undefined,
+      };
+    } catch (error) {
+      console.error(
+        `page.tsx - Error in fetchWeatherByCoords for ${lat},${lng}:`,
+        error
+      );
+      setApiError(
+        error instanceof Error ? error.message : "Unknown fetch error"
+      );
+      return { city, lat, lng, temp: 0 };
+    }
+  };
+
+  useEffect(() => {
+    const fetchInitialFavorites = async () => {
+      if (!apiKey) return;
+      const sampleCities = ["London", "New York", "Tokyo"];
+      try {
+        const fetchedFavorites = await Promise.all(
+          sampleCities.map(fetchWeatherByCity)
+        );
+        setFavorites(fetchedFavorites);
+      } catch (error) {
+        console.error("Error fetching initial favorites:", error);
+      }
+    };
+    if (isLoaded && favorites.length === 0) {
+      fetchInitialFavorites();
+    }
+  }, [isLoaded, apiKey]);
+
+  const handleMapLocationSelect = (location: {
+    lat: number;
+    lng: number;
+    city?: string;
+  }) => {
+    console.log("Map selected location:", location);
+    setMapCenter({ lat: location.lat, lng: location.lng });
+  };
+
+  const handleFavoriteSelect = (location: {
+    lat: number;
+    lng: number;
+    city?: string;
+  }) => {
+    console.log("Favorite selected location:", location);
+    setSelectedLocation(location);
+    setMapCenter({ lat: location.lat, lng: location.lng });
+  };
+
+  const handleCloseDetailedView = () => {
+    setSelectedLocation(null);
+  };
+
+  const handleToggleUnit = () => {
+    console.log(
+      "Toggling units, current favorites:",
+      JSON.stringify(favorites)
+    );
+    setIsCelsius((prev) => {
+      const newIsCelsius = !prev;
+      setFavorites((prevFavorites) => {
+        console.log(
+          "Updating favorites with new unit:",
+          newIsCelsius ? "C" : "F"
+        );
+        const updatedFavorites = prevFavorites.map((fav) => {
+          const cached = weatherCache[fav.city!];
+          const tempKelvin = cached?.main.temp;
+          if (!tempKelvin) {
+            console.warn(
+              `No cached tempKelvin for ${fav.city}, keeping original temp: ${fav.temp}`
+            );
+            return fav;
+          }
+          return {
+            ...fav,
+            temp: convertTemp(tempKelvin, newIsCelsius),
+          };
+        });
+        console.log(
+          "Favorites after toggle:",
+          JSON.stringify(updatedFavorites)
+        );
+        return updatedFavorites;
+      });
+      return newIsCelsius;
+    });
+  };
+
+  const addFavorite = async (city: string, lat: number, lng: number) => {
+    console.log(
+      `page.tsx - Adding favorite: ${city}, lat: ${lat}, lng: ${lng}`
+    );
+    try {
+      const weatherData = await fetchWeatherByCoords(lat, lng, city);
+      setFavorites((prev) => {
+        if (prev.some((fav) => fav.city?.toLowerCase() === city.toLowerCase()))
+          return prev;
+        const updatedFavorites = [...prev, weatherData];
+        console.log(
+          "Favorites after adding:",
+          JSON.stringify(updatedFavorites)
+        );
+        return updatedFavorites;
+      });
+    } catch (error) {
+      console.error(`Error adding favorite ${city}:`, error);
+    }
+  };
+
+  const removeFavorite = (city: string) => {
+    setFavorites((prev) => {
+      const updatedFavorites = prev.filter((fav) => fav.city !== city);
+      console.log(
+        "Favorites after removing:",
+        JSON.stringify(updatedFavorites)
+      );
+      return updatedFavorites;
+    });
+  };
+
+  if (!googleMapsApiKey) {
+    return (
+      <div style={{ color: "red" }}>Error: Google Maps API key is missing</div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div style={{ color: "red" }}>
+        Error loading Google Maps: ${loadError.message}
+      </div>
+    );
+  }
+
+  if (!isLoaded) {
+    return <div>Loading Google Maps...</div>;
+  }
+
+  if (apiError) {
+    return <div style={{ color: "red" }}>{apiError}</div>;
+  }
+
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(8, 1fr)",
+        gridTemplateRows: "repeat(8, 1fr)",
+        gap: "10px",
+        width: "100vw",
+        height: "100vh",
+      }}
+    >
+      <Map
+        style={{ gridColumn: "1 / -1", gridRow: "1 / -1" }}
+        onLocationSelect={handleMapLocationSelect}
+        selectedLocation={mapCenter}
+        isLoaded={isLoaded}
+        isCelsius={isCelsius}
+        addFavorite={addFavorite}
+        fetchWeatherByCoords={fetchWeatherByCoords}
+      />
+      <SearchBar
+        onLocationSelect={handleMapLocationSelect}
+        isLoaded={isLoaded}
+      />
+      <Favorites
+        isCelsius={isCelsius}
+        favorites={favorites}
+        removeFavorite={removeFavorite}
+        onFavoriteSelect={handleFavoriteSelect}
+      />
+      <ToggleSwitch isCelsius={isCelsius} onToggle={handleToggleUnit} />
+      {selectedLocation && (
+        <DetailedView
+          location={selectedLocation}
+          isCelsius={isCelsius}
+          onClose={handleCloseDetailedView}
+        />
+      )}
     </div>
   );
 }

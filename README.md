@@ -1,3 +1,51 @@
+## ASSUMPTIONS & EXPLANATION
+
+This application uses Next.js's App Router to create a React app, most of the code is written in TypeScript - I selected this approach because I'm already reasonably familiar with React, and discovery during the interview process mentioned that AirMason's software stack uses both Next.Js and React.
+
+I assumed that the most important functionality for the main page would be that it displays locations (cities) and includes a search function - rather than that it displays locations in a particular format, and therefore decided on an interactive map with a searchbar as the most user friendly way to display the relevant information.
+
+I set up the basic React app and manually wrote the components and basic layouts using CSS Grid, but relied heavily on an AI application (Grok) to generate the bulk of the functionality and help with debugging during development.
+
+All the main components are rendered in pages.tsx
+
+Building this project probably took a total of around 12 hours with AI support. I'm confident that I could build this project without AI support if necessary, but would likely budget at least a full week.
+
+I ran into API rate limits twice during the build, and did some optimization around the number of calls made to the OpenWeatherMap API.
+
+If I were to continue development of this project, I would look into:
+
+- refining the user interface (specifically the map cards, favorites list, detailed view, and temperature toggle switch container)
+- resolving some minor bugs (for example, when a map location is selected, and the temperature toggle is clicked, the temperature on the card does not update as expected)
+- implementing end user login functionality
+- implementing a database
+- more robust handling of caching / cookies
+- resolve some issues in the code highlighted by the linter (that are not currently affecting functionality)
+- make the app mobile-first in order that it can be used on mobile web browsers
+- if this application were to be deployed in production it would likely require a backend server from which the API calls would be made and the API keys stored
+
+## INSTRUCTIONS
+
+This application requires access to:
+
+1. an OpenWeatherMap API key (https://home.openweathermap.org/api_keys), and
+2. a Google Maps API key (https://console.cloud.google.com/google/maps-apis/credentials)
+
+\*\*\* the Google Maps API key must have "Maps JavaScript API" and "Places API" and "Geocoding API" enabled (https://console.cloud.google.com/google/maps-apis/api-list)
+
+Download the repository.
+
+Create a '.env.local' file in the root directory with the following variables (see 'env.example' for sample file):
+NEXT_PUBLIC_WEATHER_API_KEY=<API_KEY>
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=<API_KEY>
+
+Open a terminal window and navigate to the root directly of the project.
+
+Then run the following commands:
+$ npm install
+$ npm run dev
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
