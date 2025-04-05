@@ -34,8 +34,8 @@ This application requires access to:
 Download the repository.
 
 Create a '.env.local' file in the root directory with the following variables (see 'env.example' for sample file):
-NEXT_PUBLIC_WEATHER_API_KEY=<API_KEY>
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=<API_KEY>
+- NEXT_PUBLIC_WEATHER_API_KEY=<API_KEY>
+- NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=<API_KEY>
 
 Open a terminal window and navigate to the root directly of the project.
 
