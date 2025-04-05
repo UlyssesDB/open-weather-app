@@ -280,7 +280,7 @@ export default function Map({
     weather: string;
     icon: string;
   }) => (
-    <div style={{ textAlign: "center" }}>
+    <div style={{ textAlign: "center", color: "black" }}>
       <img src={icon} alt="weather icon" />
       <br />
       <strong>{city}</strong>
