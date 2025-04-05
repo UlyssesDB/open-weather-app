@@ -309,7 +309,7 @@ export default function Home() {
         gridTemplateRows: "repeat(8, 1fr)",
         gap: "10px",
         width: "100vw",
-        height: "50vh",
+        height: "100vh",
       }}
     >
       <Map
