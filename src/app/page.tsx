@@ -179,7 +179,7 @@ export default function Home() {
   useEffect(() => {
     const fetchInitialFavorites = async () => {
       if (!apiKey) return;
-      const sampleCities = ["London", "New York", "Tokyo"];
+      const sampleCities = ["Montreal", "New York", "Toronto"];
       try {
         const fetchedFavorites = await Promise.all(
           sampleCities.map(fetchWeatherByCity)
