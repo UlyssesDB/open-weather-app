@@ -1,15 +1,19 @@
 "use client";
 
+import { convertTemp } from "../utils/convertTemp";
+
 interface Favorite {
   city: string;
   lat: number;
   lng: number;
-  temp: number; // Pre-converted temp
+  tempKelvin: number; // Changed to tempKelvin
+  weather?: string;
+  icon?: string;
 }
 
 interface FavoritesProps {
   isCelsius: boolean;
-  favorites?: Favorite[]; // Made optional to handle undefined
+  favorites: Favorite[];
   removeFavorite: (city: string) => void;
   onFavoriteSelect: (location: {
     lat: number;
@@ -20,7 +24,7 @@ interface FavoritesProps {
 
 export default function Favorites({
   isCelsius,
-  favorites = [], // Default to empty array if undefined
+  favorites,
   removeFavorite,
   onFavoriteSelect,
 }: FavoritesProps) {
@@ -34,6 +38,7 @@ export default function Favorites({
         gridRowStart: "1",
         gridRowEnd: "7",
         padding: "10px",
+        color: "black",
       }}
     >
       <h3 style={{ margin: "0 0 5px 0", fontSize: "16px" }}>Favorites</h3>
@@ -61,7 +66,8 @@ export default function Favorites({
               }}
             >
               <span>
-                {fav.city}: {fav.temp.toFixed(1)}°{isCelsius ? "C" : "F"}
+                {fav.city}: {convertTemp(fav.tempKelvin, isCelsius).toFixed(1)}°
+                {isCelsius ? "C" : "F"}
               </span>
               <button
                 onClick={(e) => {

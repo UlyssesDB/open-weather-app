@@ -172,6 +172,7 @@ export default function SearchBar({
         padding: "10px",
         position: "relative",
         height: "50%",
+        color: "black",
       }}
     >
       <div style={{ display: "flex", gap: "10px" }}>

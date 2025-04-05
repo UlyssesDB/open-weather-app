@@ -102,6 +102,7 @@ export default function DetailedView({
           backgroundColor: "white",
           padding: "10px",
           zIndex: 10,
+          color: "black",
         }}
       >
         <h2>Loading...</h2>
@@ -118,6 +119,7 @@ export default function DetailedView({
           backgroundColor: "white",
           padding: "10px",
           zIndex: 10,
+          color: "black",
         }}
       >
         <h2>Error</h2>
@@ -136,6 +138,7 @@ export default function DetailedView({
         overflowY: "auto",
         zIndex: 10,
         margin: "-50px 0px 10px 10px",
+        color: "black",
       }}
     >
       <div

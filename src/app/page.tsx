@@ -30,7 +30,7 @@ interface Location {
   lat: number;
   lng: number;
   city?: string;
-  temp: number;
+  tempKelvin: number; // Raw Kelvin instead of pre-converted temp
   weather?: string;
   icon?: string;
 }
@@ -66,7 +66,7 @@ export default function Home() {
         city,
         lat: cached.coord.lat,
         lng: cached.coord.lon,
-        temp: convertTemp(cached.main.temp, isCelsius),
+        tempKelvin: cached.main.temp, // Pass raw Kelvin
         weather: cached.weather[0]?.description,
         icon: cached.weather[0]?.icon
           ? `http://openweathermap.org/img/w/${cached.weather[0].icon}.png`
@@ -94,7 +94,7 @@ export default function Home() {
         city,
         lat: data.coord.lat,
         lng: data.coord.lon,
-        temp: convertTemp(data.main.temp, isCelsius),
+        tempKelvin: data.main.temp, // Pass raw Kelvin
         weather: data.weather[0]?.description,
         icon: data.weather[0]?.icon
           ? `http://openweathermap.org/img/w/${data.weather[0].icon}.png`
@@ -108,7 +108,7 @@ export default function Home() {
       setApiError(
         error instanceof Error ? error.message : "Unknown fetch error"
       );
-      return { city, lat: 0, lng: 0, temp: 0 };
+      return { city, lat: 0, lng: 0, tempKelvin: 0 };
     }
   };
 
@@ -124,7 +124,7 @@ export default function Home() {
         city,
         lat: cached.coord.lat,
         lng: cached.coord.lon,
-        temp: convertTemp(cached.main.temp, isCelsius),
+        tempKelvin: cached.main.temp, // Pass raw Kelvin
         weather: cached.weather[0]?.description,
         icon: cached.weather[0]?.icon
           ? `http://openweathermap.org/img/w/${cached.weather[0].icon}.png`
@@ -158,7 +158,7 @@ export default function Home() {
         city,
         lat: data.coord.lat,
         lng: data.coord.lon,
-        temp: convertTemp(data.main.temp, isCelsius),
+        tempKelvin: data.main.temp, // Pass raw Kelvin
         weather: data.weather[0]?.description,
         icon: data.weather[0]?.icon
           ? `http://openweathermap.org/img/w/${data.weather[0].icon}.png`
@@ -172,7 +172,7 @@ export default function Home() {
       setApiError(
         error instanceof Error ? error.message : "Unknown fetch error"
       );
-      return { city, lat, lng, temp: 0 };
+      return { city, lat, lng, tempKelvin: 0 };
     }
   };
 
@@ -231,16 +231,10 @@ export default function Home() {
         );
         const updatedFavorites = prevFavorites.map((fav) => {
           const cached = weatherCache[fav.city!];
-          const tempKelvin = cached?.main.temp;
-          if (!tempKelvin) {
-            console.warn(
-              `No cached tempKelvin for ${fav.city}, keeping original temp: ${fav.temp}`
-            );
-            return fav;
-          }
+          const tempKelvin = cached?.main.temp || fav.tempKelvin; // Fallback to stored tempKelvin
           return {
             ...fav,
-            temp: convertTemp(tempKelvin, newIsCelsius),
+            tempKelvin, // Ensure tempKelvin is preserved
           };
         });
         console.log(
@@ -315,7 +309,7 @@ export default function Home() {
         gridTemplateRows: "repeat(8, 1fr)",
         gap: "10px",
         width: "100vw",
-        height: "100vh",
+        height: "50vh",
       }}
     >
       <Map

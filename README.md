@@ -4,7 +4,7 @@ This application uses Next.js's App Router to create a React app, most of the co
 
 I assumed that the most important functionality for the main page would be that it displays locations (cities) and includes a search function - rather than that it displays locations in a particular format, and therefore decided on an interactive map with a searchbar as the most user friendly way to display the relevant information.
 
-I set up the basic React app and manually wrote the components and basic layouts using CSS Grid, but relied heavily on an AI application (Grok) to generate the bulk of the functionality and help with debugging during development.
+I set up the basic React app and manually wrote the components and basic layouts using CSS Grid, but used an AI application (Grok) to help me devlop much of the functionality and help with debugging during development.
 
 All the main components are rendered in pages.tsx
 
@@ -15,13 +15,12 @@ I ran into API rate limits twice during the build, and did some optimization aro
 If I were to continue development of this project, I would look into:
 
 - refining the user interface (specifically the map cards, favorites list, detailed view, and temperature toggle switch container)
-- resolving some minor bugs (for example, when a map location is selected, and the temperature toggle is clicked, the temperature on the card does not update as expected)
 - implementing end user login functionality
 - implementing a database
 - more robust handling of caching / cookies
 - resolve some issues in the code highlighted by the linter (that are not currently affecting functionality)
 - make the app mobile-first in order that it can be used on mobile web browsers
-- if this application were to be deployed in production it would likely require a backend server from which the API calls would be made and the API keys stored
+- if this application were to be deployed in production it would require a backend server from which the API calls would be made and the API keys stored
 
 ## INSTRUCTIONS
 

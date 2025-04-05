@@ -33,7 +33,7 @@ interface MapProps {
     city?: string;
     lat: number;
     lng: number;
-    temp: number;
+    tempKelvin: number; // Expect raw Kelvin
     weather?: string;
     icon?: string;
   }>;
@@ -60,7 +60,7 @@ export default function Map({
     lat: number;
     lng: number;
     city: string;
-    temp: number;
+    tempKelvin: number; // Raw Kelvin from API
     weather: string;
     icon: string;
   } | null>(null);
@@ -229,7 +229,7 @@ export default function Map({
               lat,
               lng,
               city,
-              temp: weatherData.temp,
+              tempKelvin: weatherData.tempKelvin, // Use raw Kelvin from fetch
               weather: weatherData.weather || "",
               icon: weatherData.icon || "",
             });
@@ -254,7 +254,6 @@ export default function Map({
     checkIfDataRequested,
     handleMapClick,
     onLocationSelect,
-    isCelsius,
     addFavorite,
     fetchWeatherByCoords,
   ]);
@@ -270,14 +269,14 @@ export default function Map({
     city,
     lat,
     lng,
-    temp,
+    tempKelvin,
     weather,
     icon,
   }: {
     city: string;
     lat: number;
     lng: number;
-    temp: number;
+    tempKelvin: number;
     weather: string;
     icon: string;
   }) => (
@@ -286,7 +285,7 @@ export default function Map({
       <br />
       <strong>{city}</strong>
       <br />
-      {temp.toFixed(1)}°{isCelsius ? "C" : "F"}
+      {convertTemp(tempKelvin, isCelsius).toFixed(1)}°{isCelsius ? "C" : "F"}
       <br />
       {weather}
       <br />
@@ -347,7 +346,7 @@ export default function Map({
                 city={infoWindow.city}
                 lat={infoWindow.lat}
                 lng={infoWindow.lng}
-                temp={infoWindow.temp}
+                tempKelvin={infoWindow.tempKelvin}
                 weather={infoWindow.weather}
                 icon={infoWindow.icon}
               />
