@@ -4,7 +4,7 @@ This application uses Next.js's App Router to create a React app, most of the co
 
 I assumed that the most important functionality for the main page would be that it displays locations (cities) and includes a search function - rather than that it displays locations in a particular format, and therefore decided on an interactive map with a searchbar as the most user friendly way to display the relevant information.
 
-I set up the basic React app and manually wrote the components and basic layouts using CSS Grid, but used an AI application (Grok) to help me devlop much of the functionality and help with debugging during development.
+I set up the basic React app and manually wrote the components and basic layouts using CSS Grid, but used an AI application (Grok) to help me develop much of the functionality and help with debugging during development.
 
 All the main components are rendered in pages.tsx
 
@@ -40,10 +40,10 @@ Create a '.env.local' file in the root directory with the following variables (s
 Open a terminal window and navigate to the root directly of the project.
 
 Then run the following commands:
-$ npm install
-$ npm run dev
+- $ npm install
+- $ npm run dev
 
-app runs on http://localhost:3000
+The app runs on http://localhost:3000
 
 ---
 
