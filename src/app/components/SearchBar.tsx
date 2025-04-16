@@ -164,18 +164,21 @@ export default function SearchBar({
   return (
     <div
       style={{
-        display: "grid",
-        gridColumnStart: "1",
-        gridColumnEnd: "7",
-        gridRowStart: "1",
-        gridRowEnd: "1",
-        padding: "10px",
+        width: "100%",
         position: "relative",
-        height: "50%",
         color: "black",
       }}
     >
-      <div style={{ display: "flex", gap: "10px" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "10px",
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          borderRadius: "8px",
+          padding: "12px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        }}
+      >
         <input
           type="text"
           value={query}
@@ -184,22 +187,35 @@ export default function SearchBar({
           placeholder="Search for a city..."
           style={{
             flex: 1,
-            padding: "5px",
-            border: "1px solid black",
-            borderRadius: "4px",
+            padding: "10px 12px",
+            border: "1px solid #e0e0e0",
+            borderRadius: "6px",
             backgroundColor: "white",
+            fontSize: "16px",
+            outline: "none",
+            transition: "border-color 0.2s ease",
+            boxShadow: "inset 0 1px 3px rgba(0, 0, 0, 0.05)",
           }}
+          aria-label="Search for a city"
         />
         <button
           onClick={handleSearch}
           style={{
-            padding: "5px 10px",
+            padding: "10px 16px",
             backgroundColor: "#2196F3",
             color: "white",
             border: "none",
-            borderRadius: "4px",
+            borderRadius: "6px",
             cursor: "pointer",
+            fontSize: "16px",
+            fontWeight: "500",
+            transition: "background-color 0.2s ease",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 2px 4px rgba(33, 150, 243, 0.2)",
           }}
+          aria-label="Search"
         >
           Search
         </button>
@@ -208,33 +224,42 @@ export default function SearchBar({
         <ul
           style={{
             position: "absolute",
-            top: "100%",
-            left: "10px",
-            right: "70px",
+            top: "calc(100% - 10px)",
+            left: "16px",
+            right: "16px",
             backgroundColor: "white",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
+            border: "1px solid #e0e0e0",
+            borderRadius: "8px",
             listStyle: "none",
-            padding: "0",
+            padding: "8px 0",
             margin: "0",
-            maxHeight: "200px",
+            maxHeight: "300px",
             overflowY: "auto",
             zIndex: 1000,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
           }}
+          role="listbox"
+          aria-label="Search suggestions"
         >
           {suggestions.map((suggestion, index) => (
             <li
               key={suggestion.place_id}
               onClick={() => handleSuggestionSelect(suggestion.description)}
               style={{
-                padding: "5px 10px",
+                padding: "10px 16px",
                 cursor: "pointer",
-                borderBottom: "1px solid #eee",
+                borderBottom:
+                  index < suggestions.length - 1 ? "1px solid #f0f0f0" : "none",
                 backgroundColor:
-                  highlightedIndex === index ? "#f0f0f0" : "white",
+                  highlightedIndex === index ? "#f5f9ff" : "white",
+                transition: "background-color 0.15s ease",
+                fontSize: "15px",
+                color: highlightedIndex === index ? "#2196F3" : "#333",
               }}
               onMouseOver={() => setHighlightedIndex(index)}
               onMouseOut={() => setHighlightedIndex(-1)}
+              role="option"
+              aria-selected={highlightedIndex === index}
             >
               {suggestion.description}
             </li>

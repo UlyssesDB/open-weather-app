@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { GoogleMap, InfoWindow } from "@react-google-maps/api";
-import { convertTemp } from "../utils/convertTemp";
+import { convertTemp, formatTemp } from "../utils/convertTemp";
 
 const containerStyle = {
   width: "100%",
@@ -281,24 +281,49 @@ export default function Map({
     icon: string;
   }) => (
     <div style={{ textAlign: "center", color: "black" }}>
-      <img src={icon} alt="weather icon" />
-      <br />
-      <strong>{city}</strong>
-      <br />
-      {convertTemp(tempKelvin, isCelsius).toFixed(1)}°{isCelsius ? "C" : "F"}
-      <br />
-      {weather}
+      <img
+        src={icon}
+        alt="weather icon"
+        style={{ width: "50px", height: "50px" }}
+      />
+      <div style={{ margin: "5px 0" }}>
+        <strong style={{ fontSize: "16px" }}>{city}</strong>
+      </div>
+      <div
+        style={{
+          fontSize: "18px",
+          fontWeight: "bold",
+          margin: "5px 0",
+          color: "#2196F3",
+        }}
+      >
+        {formatTemp(convertTemp(tempKelvin, isCelsius), isCelsius)}
+      </div>
+      <div
+        style={{
+          fontSize: "14px",
+          color: "#666",
+          textTransform: "capitalize",
+          margin: "5px 0",
+        }}
+      >
+        {weather}
+      </div>
       <br />
       <button
         onClick={() => handleAddFavorite(city, lat, lng)}
         style={{
-          marginTop: "5px",
-          padding: "5px 10px",
+          marginTop: "10px",
+          padding: "8px 16px",
           backgroundColor: "#2196F3",
           color: "white",
           border: "none",
-          borderRadius: "4px",
+          borderRadius: "6px",
           cursor: "pointer",
+          fontSize: "14px",
+          fontWeight: "500",
+          boxShadow: "0 2px 4px rgba(33, 150, 243, 0.2)",
+          transition: "background-color 0.2s ease",
         }}
       >
         Add to Favorites
