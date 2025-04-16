@@ -2,7 +2,7 @@ This application uses Next.js's App Router to create a React app, most of the co
 
 Future improvements:
 
-- make the app mobile-first in order that it can be used on mobile web browsers
+- make the application mobile-first
 - if this application were to be deployed in production it would require a backend server from which the API calls would be made and the API keys stored
 
 ## INSTRUCTIONS
