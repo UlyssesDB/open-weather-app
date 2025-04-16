@@ -1,5 +1,3 @@
-## ASSUMPTIONS & EXPLANATION
-
 This application uses Next.js's App Router to create a React app, most of the code is written in TypeScript.
 
 Future improvements:
