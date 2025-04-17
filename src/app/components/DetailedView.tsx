@@ -329,7 +329,9 @@ export default function DetailedView({
         color: "#333",
         maxWidth: style ? "100%" : "90%",
         width: style ? "100%" : "600px",
-        height: style ? "100%" : "auto",
+        height: style ? "100%" : "80vh",
+        display: "flex",
+        flexDirection: "column",
         maxHeight: style ? "100%" : "90vh",
         ...style,
       }}
@@ -439,9 +441,10 @@ export default function DetailedView({
       <div
         style={{
           padding: "20px",
-          height: "400px" /* Fixed height */,
+          flex: "1",
           overflowY: "auto",
           boxSizing: "border-box" as const,
+          minHeight: "500px",
         }}
       >
         <div>
@@ -694,7 +697,7 @@ export default function DetailedView({
             )}
 
           {activeTab === "hourly" && forecast && (
-            <div style={{ minHeight: "400px" }}>
+            <div style={{ height: "100%" }}>
               <ul
                 style={{
                   listStyle: "none",
@@ -777,7 +780,7 @@ export default function DetailedView({
           )}
 
           {activeTab === "daily" && forecast && (
-            <div style={{ minHeight: "400px" }}>
+            <div style={{ height: "100%" }}>
               <ul
                 style={{
                   listStyle: "none",

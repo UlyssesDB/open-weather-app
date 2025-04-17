@@ -265,11 +265,12 @@ export default function Home() {
           isCelsius={isCelsius}
           onClose={clearSelectedLocation}
           style={{
-            gridColumnStart: 1,
-            gridColumnEnd: 7,
-            gridRowStart: 2,
-            gridRowEnd: 8,
-            margin: "10px", // Standard 10px margin on all sides
+            position: "absolute",
+            top: "80px", // Same as favorites list
+            left: "10px",
+            width: "calc(100vw - 340px)", // Full width minus favorites list width and margins
+            height: "calc(100vh - 200px)", // Same height as favorites list
+            margin: "0",
             zIndex: 50,
           }}
         />
